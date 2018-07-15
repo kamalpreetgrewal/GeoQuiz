@@ -1,0 +1,44 @@
+package com.example.kamal.geoquiz;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+public class QuizActivity extends AppCompatActivity {
+
+    private Button mTrueButton;
+    private Button mFalseButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_quiz);
+
+        /**
+         * Retrieve the inflated objects from resources and assign them to button variables and
+         * then implement interfaces for the two buttons
+         */
+        mTrueButton = (Button) findViewById(R.id.true_button);
+        mTrueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast toast = Toast.makeText(QuizActivity.this, R.string.correct_toast, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 10, 10);
+                toast.show();
+            }
+        });
+
+        mFalseButton = (Button) findViewById(R.id.false_button);
+        mFalseButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Toast toast = Toast.makeText(QuizActivity.this, R.string.incorrect_toast, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 10, -10);
+                toast.show();
+            }
+        });
+    }
+}
