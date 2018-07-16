@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,8 +13,8 @@ public class QuizActivity extends AppCompatActivity {
 
     private Button mTrueButton;
     private Button mFalseButton;
-    private Button mNextButton;
-    private Button mPrevButton;
+    private ImageButton mNextButton;
+    private ImageButton mPrevButton;
     private TextView mQuestionTextview;
 
     // This array stores the questions.
@@ -66,23 +67,33 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
-        mNextButton = (Button) findViewById(R.id.next_button);
+        mNextButton = (ImageButton) findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Increment the index of the question and update question view.
-                mCurrentIndex++;
-                updateQuestion();
+                if (mCurrentIndex == mQuestionBank.length-1) {
+                    Toast.makeText(QuizActivity.this, R.string.no_next_question,
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    mCurrentIndex++;
+                    updateQuestion();
+                }
             }
         });
 
-        mPrevButton = (Button) findViewById(R.id.prev_button);
+        mPrevButton = (ImageButton) findViewById(R.id.prev_button);
         mPrevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Decrement the index and display previous question in the array.
-                mCurrentIndex--;
-                updateQuestion();
+                if (mCurrentIndex > 0) {
+                    mCurrentIndex--;
+                    updateQuestion();
+                } else {
+                    Toast.makeText(QuizActivity.this, R.string.no_prev_question,
+                            Toast.LENGTH_SHORT).show();
+                }
 
             }
         });

@@ -5,7 +5,9 @@
     <string name="correct_toast">Correct</string>
     <string name="incorrect_toast">Incorrect</string>
     <string name="next_button">Next</string>
-    <string name="prev_button">Prev</string>
+    <string name="prev_button">Previous</string>
+    <string name="no_prev_question">This is the first question.</string>
+    <string name="no_next_question">This is the last question of quiz.</string>
     <string name="question_india">Delhi is the capital of India.</string>
     <string name="question_australia">Canberra is the capital of Australia.</string>
     <string name="question_oceans">The Pacific Ocean is larger than the Atlantic Ocean.</string>
