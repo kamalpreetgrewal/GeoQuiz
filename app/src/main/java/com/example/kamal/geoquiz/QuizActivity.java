@@ -13,6 +13,7 @@ public class QuizActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
+    private Button mPrevButton;
     private TextView mQuestionTextview;
 
     // This array stores the questions.
@@ -35,6 +36,13 @@ public class QuizActivity extends AppCompatActivity {
         setContentView(R.layout.activity_quiz);
 
         mQuestionTextview = (TextView) findViewById(R.id.question_textview);
+        mQuestionTextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurrentIndex++;
+                updateQuestion();
+            }
+        });
         // Initialise the textview with first question from the question bank.
         updateQuestion();
 
@@ -65,6 +73,17 @@ public class QuizActivity extends AppCompatActivity {
                 // Increment the index of the question and update question view.
                 mCurrentIndex++;
                 updateQuestion();
+            }
+        });
+
+        mPrevButton = (Button) findViewById(R.id.prev_button);
+        mPrevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Decrement the index and display previous question in the array.
+                mCurrentIndex--;
+                updateQuestion();
+
             }
         });
     }
