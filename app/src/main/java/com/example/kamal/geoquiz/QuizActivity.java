@@ -37,6 +37,8 @@ public class QuizActivity extends AppCompatActivity {
 
     // This variable is used to keep track of questions in question bank.
     private int mCurrentIndex = 0;
+    // This variable will store percentage score for the quiz.
+    private double mScore = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +89,10 @@ public class QuizActivity extends AppCompatActivity {
                 if (mCurrentIndex == mQuestionBank.length-1) {
                     Toast.makeText(QuizActivity.this, R.string.no_next_question,
                             Toast.LENGTH_SHORT).show();
+                    // Compute percentage and show result upto 2 decimal places.
+                    mScore = (mScore/mQuestionBank.length) * 100;
+                    Toast.makeText(QuizActivity.this, "Your percentage score is " +
+                            String.format("%.2f", mScore) + ".", Toast.LENGTH_SHORT).show();
                 } else {
                     mCurrentIndex++;
                     updateQuestion();
@@ -173,6 +179,7 @@ public class QuizActivity extends AppCompatActivity {
          */
         if (userPressedButton == isAnswerTrue) {
             messageResId = R.string.correct_toast;
+            mScore += 1;
         } else {
             messageResId = R.string.incorrect_toast;
         }
