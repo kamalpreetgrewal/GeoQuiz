@@ -44,11 +44,13 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_quiz);
 
+        // Save the activity instance state for any runtime changes
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
         }
 
         mQuestionTextview = (TextView) findViewById(R.id.question_textview);
+        // Change to next question when question text is clicked
         mQuestionTextview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,8 +58,6 @@ public class QuizActivity extends AppCompatActivity {
                 updateQuestion();
             }
         });
-        // Initialise the textview with first question from the question bank.
-        updateQuestion();
 
         /**
          * Retrieve the inflated objects from resources and assign them to button variables and
@@ -109,6 +109,9 @@ public class QuizActivity extends AppCompatActivity {
 
             }
         });
+
+        // Initialise the textview with first question from the question bank.
+        updateQuestion();
     }
 
     @Override
@@ -152,12 +155,16 @@ public class QuizActivity extends AppCompatActivity {
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getQuestionTextId();
         mQuestionTextview.setText(question);
+        setAnswerButtons();
     }
 
     // This method checks if the answer is correct/incorrect.
     private void checkAnswer(boolean userPressedButton) {
-        boolean isAnswerTrue = mQuestionBank[mCurrentIndex].getAnswerTrue();
+        Question question = mQuestionBank[mCurrentIndex];
+        question.setAnswered(true);
+        setAnswerButtons();
 
+        boolean isAnswerTrue = question.getAnswerTrue();
         int messageResId = 0;
 
         /**
@@ -169,7 +176,22 @@ public class QuizActivity extends AppCompatActivity {
         } else {
             messageResId = R.string.incorrect_toast;
         }
-
         Toast.makeText(QuizActivity.this, messageResId, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * This method enables/disables true/false answer buttons. If the question has been
+     * answered once, the buttons are disabled to prevent multiple answers to the same
+     * question.
+     */
+    private void setAnswerButtons() {
+        Question currentQuestion = mQuestionBank[mCurrentIndex];
+        if (currentQuestion.getAnswered()) {
+            mTrueButton.setEnabled(false);
+            mFalseButton.setEnabled(false);
+        } else {
+            mTrueButton.setEnabled(true);
+            mFalseButton.setEnabled(true);
+        }
     }
 }
