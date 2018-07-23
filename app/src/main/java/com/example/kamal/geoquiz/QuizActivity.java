@@ -1,10 +1,9 @@
 package com.example.kamal.geoquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -20,9 +19,8 @@ public class QuizActivity extends AppCompatActivity {
 
     private Button mTrueButton;
     private Button mFalseButton;
-    private ImageButton mNextButton;
-    private ImageButton mPrevButton;
     private TextView mQuestionTextview;
+    private Button mCheatButton;
 
     // This array stores the questions.
     private Question[] mQuestionBank = new Question[] {
@@ -61,9 +59,9 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
-        /**
-         * Retrieve the inflated objects from resources and assign them to button variables and
-         * then implement interfaces for the two buttons
+        /*
+          Retrieve the inflated objects from resources and assign them to button variables and
+          then implement interfaces for the two buttons.
          */
         mTrueButton = (Button) findViewById(R.id.true_button);
         mTrueButton.setOnClickListener(new View.OnClickListener() {
@@ -81,8 +79,8 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
-        mNextButton = (ImageButton) findViewById(R.id.next_button);
-        mNextButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton nextButton = (ImageButton) findViewById(R.id.next_button);
+        nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Increment the index of the question and update question view.
@@ -100,8 +98,8 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
-        mPrevButton = (ImageButton) findViewById(R.id.prev_button);
-        mPrevButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton prevButton = (ImageButton) findViewById(R.id.prev_button);
+        prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Decrement the index and display previous question in the array.
@@ -113,6 +111,16 @@ public class QuizActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
 
+            }
+        });
+
+        mCheatButton = (Button) findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start CheatActivity
+                Intent intent = new Intent(QuizActivity.this, CheatActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -171,11 +179,11 @@ public class QuizActivity extends AppCompatActivity {
         setAnswerButtons();
 
         boolean isAnswerTrue = question.getAnswerTrue();
-        int messageResId = 0;
+        int messageResId;
 
-        /**
-         * If the option selected and answer match, "Correct" is shown in toast
-         * message, otherwise "Incorrect" is displayed.
+        /*
+          If the option selected and answer match, "Correct" is shown in toast
+          message, otherwise "Incorrect" is displayed.
          */
         if (userPressedButton == isAnswerTrue) {
             messageResId = R.string.correct_toast;
