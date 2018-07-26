@@ -16,6 +16,7 @@ public class QuizActivity extends AppCompatActivity {
 
     // It is key for question for the key-value pair in the bundle.
     private static final String KEY_INDEX = "index";
+    private static final int REQUEST_CODE_CHEAT = 0;
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -37,6 +38,8 @@ public class QuizActivity extends AppCompatActivity {
     private int mCurrentIndex = 0;
     // This variable will store percentage score for the quiz.
     private double mScore = 0.0;
+    // This variable gets value that CheatActivity is passing back.
+    private boolean mIsCheater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +96,7 @@ public class QuizActivity extends AppCompatActivity {
                             String.format("%.2f", mScore) + ".", Toast.LENGTH_SHORT).show();
                 } else {
                     mCurrentIndex++;
+                    mIsCheater = false;
                     updateQuestion();
                 }
             }
@@ -121,12 +125,17 @@ public class QuizActivity extends AppCompatActivity {
                 // Start CheatActivity
                 boolean answerIsTrue = mQuestionBank[mCurrentIndex].getAnswerTrue();
                 Intent intent = CheatActivity.newIntent(QuizActivity.this, answerIsTrue);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_CHEAT);
             }
         });
 
         // Initialise the textview with first question from the question bank.
         updateQuestion();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mIsCheater = CheatActivity.wasAnswerShown(data);
     }
 
     @Override
@@ -183,14 +192,18 @@ public class QuizActivity extends AppCompatActivity {
         int messageResId;
 
         /*
-          If the option selected and answer match, "Correct" is shown in toast
-          message, otherwise "Incorrect" is displayed.
+          If user cheats, show a judgement message otherwise if the option selected and answer
+          match, "Correct" is shown as message, otherwise "Incorrect" is displayed.
          */
-        if (userPressedButton == isAnswerTrue) {
-            messageResId = R.string.correct_toast;
-            mScore += 1;
+        if (mIsCheater) {
+            messageResId = R.string.judgement_toast;
         } else {
-            messageResId = R.string.incorrect_toast;
+            if (userPressedButton == isAnswerTrue) {
+                messageResId = R.string.correct_toast;
+                mScore += 1;
+            } else {
+                messageResId = R.string.incorrect_toast;
+            }
         }
         Toast.makeText(QuizActivity.this, messageResId, Toast.LENGTH_SHORT).show();
     }
