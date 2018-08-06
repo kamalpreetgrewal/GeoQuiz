@@ -19,6 +19,7 @@ public class QuizActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_CHEAT = 0;
     private static final String KEY_ANSWERED_ARRAY = "questionansweredarray";
     private static final String KEY_CHEATER = "cheater";
+    private static final String KEY_CHEATED_ARRAY = "answercheatedarray";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -40,8 +41,6 @@ public class QuizActivity extends AppCompatActivity {
     private int mCurrentIndex = 0;
     // This variable will store percentage score for the quiz.
     private double mScore = 0.0;
-    // This variable gets value that CheatActivity is passing back.
-    private boolean mIsCheater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +57,10 @@ public class QuizActivity extends AppCompatActivity {
                 mQuestionBank[i].setAnswered(mAnsweredArray[i]);
             }
 
-            mIsCheater = savedInstanceState.getBoolean(KEY_CHEATER);
+            boolean[] mCheatedArray = savedInstanceState.getBooleanArray(KEY_CHEATED_ARRAY);
+            for (int i = 0; i < mCheatedArray.length; i++) {
+                mQuestionBank[i].setCheated(mCheatedArray[i]);
+            }
         }
 
         mQuestionTextview = (TextView) findViewById(R.id.question_textview);
@@ -105,7 +107,6 @@ public class QuizActivity extends AppCompatActivity {
                             String.format("%.2f", mScore) + ".", Toast.LENGTH_SHORT).show();
                 } else {
                     mCurrentIndex++;
-                    mIsCheater = false;
                     updateQuestion();
                 }
             }
@@ -143,11 +144,6 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mIsCheater = CheatActivity.wasAnswerShown(data);
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart() called");
@@ -166,6 +162,12 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        boolean temp = CheatActivity.wasAnswerShown(data);
+        mQuestionBank[mCurrentIndex].setCheated(temp);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
@@ -175,9 +177,14 @@ public class QuizActivity extends AppCompatActivity {
         for (int i = 0; i < mAnsweredArray.length; i++) {
             mAnsweredArray[i] = mQuestionBank[i].getAnswered();
         }
-
         savedInstanceState.putBooleanArray(KEY_ANSWERED_ARRAY, mAnsweredArray);
-        savedInstanceState.putBoolean(KEY_CHEATER, mIsCheater);
+
+        boolean[] mCheatedArray = new boolean[mQuestionBank.length];
+        for (int i = 0; i < mCheatedArray.length; i++) {
+            mCheatedArray[i] = mQuestionBank[i].getCheated();
+            Log.d("cheat", Boolean.toString(mCheatedArray[i]));
+        }
+        savedInstanceState.putBooleanArray(KEY_CHEATED_ARRAY, mCheatedArray);
     }
 
     @Override
@@ -209,7 +216,7 @@ public class QuizActivity extends AppCompatActivity {
           If user cheats, show a judgement message otherwise if the option selected and answer
           match, "Correct" is shown as message, otherwise "Incorrect" is displayed.
          */
-        if (mIsCheater) {
+        if (mQuestionBank[mCurrentIndex].getCheated()) {
             messageResId = R.string.judgement_toast;
         } else {
             if (userPressedButton == isAnswerTrue) {
