@@ -17,7 +17,8 @@ public class QuizActivity extends AppCompatActivity {
     // It is key for question for the key-value pair in the bundle.
     private static final String KEY_INDEX = "index";
     private static final int REQUEST_CODE_CHEAT = 0;
-    private static final String IS_ANSWERED_ARRAY = "questionansweredarray";
+    private static final String KEY_ANSWERED_ARRAY = "questionansweredarray";
+    private static final String KEY_CHEATER = "cheater";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -51,10 +52,13 @@ public class QuizActivity extends AppCompatActivity {
         // Save the activity instance state for any runtime changes
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
-            boolean[] mAnsweredArray = savedInstanceState.getBooleanArray(IS_ANSWERED_ARRAY);
+
+            boolean[] mAnsweredArray = savedInstanceState.getBooleanArray(KEY_ANSWERED_ARRAY);
             for (int i = 0; i < mAnsweredArray.length; i++) {
                 mQuestionBank[i].setAnswered(mAnsweredArray[i]);
             }
+
+            mIsCheater = savedInstanceState.getBoolean(KEY_CHEATER);
         }
 
         mQuestionTextview = (TextView) findViewById(R.id.question_textview);
@@ -166,11 +170,14 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+
         boolean[] mAnsweredArray = new boolean[mQuestionBank.length];
         for (int i = 0; i < mAnsweredArray.length; i++) {
             mAnsweredArray[i] = mQuestionBank[i].getAnswered();
         }
-        savedInstanceState.putBooleanArray(IS_ANSWERED_ARRAY, mAnsweredArray);
+
+        savedInstanceState.putBooleanArray(KEY_ANSWERED_ARRAY, mAnsweredArray);
+        savedInstanceState.putBoolean(KEY_CHEATER, mIsCheater);
     }
 
     @Override
