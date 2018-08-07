@@ -25,6 +25,7 @@ public class QuizActivity extends AppCompatActivity {
     private Button mFalseButton;
     private TextView mQuestionTextview;
     private Button mCheatButton;
+    private TextView mCheatCountTextView;
 
     // This array stores the questions.
     private Question[] mQuestionBank = new Question[] {
@@ -41,6 +42,8 @@ public class QuizActivity extends AppCompatActivity {
     private int mCurrentIndex = 0;
     // This variable will store percentage score for the quiz.
     private double mScore = 0.0;
+    // This variable will keep a track of the number of times the user has cheated.
+    private int mCheatCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +142,8 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
+        mCheatCountTextView = (TextView) findViewById(R.id.cheat_count_textview);
+
         // Initialise the textview with first question from the question bank.
         updateQuestion();
     }
@@ -161,10 +166,29 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onPause() called");
     }
 
+    /**
+     * If the user has not seen the answer despite navigating to CheatActivity, the
+     * data returned is null which crashed the application. Also if the user cheats,
+     * then the Cheat button is disabled in order to not let the user waste his cheat
+     * count and the cheat counter variable is incremented.
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        boolean temp = CheatActivity.wasAnswerShown(data);
+        boolean temp = false;
+        if (data != null) {
+            temp = CheatActivity.wasAnswerShown(data);
+            mCheatButton.setEnabled(false);
+        } else {
+            mCheatButton.setEnabled(true);
+        }
+        if (temp) {
+            mCheatCount++;
+        }
         mQuestionBank[mCurrentIndex].setCheated(temp);
+        setCheatCountMessage();
     }
 
     @Override
@@ -204,6 +228,12 @@ public class QuizActivity extends AppCompatActivity {
         int question = mQuestionBank[mCurrentIndex].getQuestionTextId();
         mQuestionTextview.setText(question);
         setAnswerButtons();
+        mCheatButton.setEnabled(true);
+        // If the user has cheated three times, the cheat button is disabled.
+        if (mCheatCount >= 3) {
+            mCheatButton.setEnabled(false);
+        }
+        setCheatCountMessage();
     }
 
     // This method checks if the answer is correct/incorrect.
@@ -242,6 +272,27 @@ public class QuizActivity extends AppCompatActivity {
         } else {
             mTrueButton.setEnabled(true);
             mFalseButton.setEnabled(true);
+        }
+    }
+
+    /**
+     * This method sets the message to be displayed below the Cheat button depending
+     * on the number of chances left.
+     */
+    private void setCheatCountMessage() {
+        switch (mCheatCount) {
+            case 1:
+                mCheatCountTextView.setText("You got 2 chances.");
+                break;
+            case 2:
+                mCheatCountTextView.setText("Last chance left.");
+                break;
+            case 3:
+                mCheatCountTextView.setText("Enough cheating!");
+                break;
+            default:
+                mCheatCountTextView.setText("You get 3 chances to cheat.");
+                break;
         }
     }
 }

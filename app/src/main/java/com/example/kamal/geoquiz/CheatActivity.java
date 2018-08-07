@@ -1,11 +1,16 @@
 package com.example.kamal.geoquiz;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class CheatActivity extends AppCompatActivity {
@@ -22,6 +27,7 @@ public class CheatActivity extends AppCompatActivity {
     private TextView mAnswerTextView;
     private Button mShowAnswerButton;
     private boolean mIsCheater;
+    private TextView apiTextView;
 
     // Encapsulate the intent that starts this activity and call this method in calling activity
     public static Intent newIntent(Context context, boolean answerIsTrue) {
@@ -38,6 +44,8 @@ public class CheatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cheat);
+
+        LinearLayout cheatLinearLayout = (LinearLayout) findViewById(R.id.cheat_activity_layout);
 
         mAnswerTextView = (TextView) findViewById(R.id.answer_textview);
         mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
@@ -60,8 +68,34 @@ public class CheatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                showAnswerText();
+
+                // Check for backwards compatibility
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    int cx = mShowAnswerButton.getWidth() / 2;
+                    int cy = mShowAnswerButton.getHeight() / 2;
+                    float radius = mShowAnswerButton.getWidth();
+                    Animator anim = ViewAnimationUtils.createCircularReveal(
+                            mShowAnswerButton, cx, cy, radius, 0);
+                    anim.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            mShowAnswerButton.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                    anim.start();
+                } else {
+                    mShowAnswerButton.setVisibility(View.INVISIBLE);
+                }
             }
         });
+
+        apiTextView = new TextView(CheatActivity.this);
+        apiTextView.setText("API Level " + Build.VERSION.SDK_INT);
+        apiTextView.setTextSize(12);
+        apiTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        apiTextView.setPadding(6, 6, 6, 6);
+        cheatLinearLayout.addView(apiTextView);
     }
 
     @Override
