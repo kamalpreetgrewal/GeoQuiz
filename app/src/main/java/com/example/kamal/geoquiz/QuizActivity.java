@@ -20,6 +20,7 @@ public class QuizActivity extends AppCompatActivity {
     private static final String KEY_ANSWERED_ARRAY = "questionansweredarray";
     private static final String KEY_CHEATER = "cheater";
     private static final String KEY_CHEATED_ARRAY = "answercheatedarray";
+    private static final String KEY_SCORE = "quizscore";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -50,21 +51,6 @@ public class QuizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_quiz);
-
-        // Save the activity instance state for any runtime changes
-        if (savedInstanceState != null) {
-            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
-
-            boolean[] mAnsweredArray = savedInstanceState.getBooleanArray(KEY_ANSWERED_ARRAY);
-            for (int i = 0; i < mAnsweredArray.length; i++) {
-                mQuestionBank[i].setAnswered(mAnsweredArray[i]);
-            }
-
-            boolean[] mCheatedArray = savedInstanceState.getBooleanArray(KEY_CHEATED_ARRAY);
-            for (int i = 0; i < mCheatedArray.length; i++) {
-                mQuestionBank[i].setCheated(mCheatedArray[i]);
-            }
-        }
 
         mQuestionTextview = (TextView) findViewById(R.id.question_textview);
         // Change to next question when question text is clicked
@@ -192,6 +178,27 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Save the activity instance state for any runtime changes
+        if (savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+
+            boolean[] mAnsweredArray = savedInstanceState.getBooleanArray(KEY_ANSWERED_ARRAY);
+            for (int i = 0; i < mAnsweredArray.length; i++) {
+                mQuestionBank[i].setAnswered(mAnsweredArray[i]);
+            }
+
+            boolean[] mCheatedArray = savedInstanceState.getBooleanArray(KEY_CHEATED_ARRAY);
+            for (int i = 0; i < mCheatedArray.length; i++) {
+                mQuestionBank[i].setCheated(mCheatedArray[i]);
+            }
+
+            mScore = savedInstanceState.getDouble(KEY_SCORE);
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
@@ -206,9 +213,10 @@ public class QuizActivity extends AppCompatActivity {
         boolean[] mCheatedArray = new boolean[mQuestionBank.length];
         for (int i = 0; i < mCheatedArray.length; i++) {
             mCheatedArray[i] = mQuestionBank[i].getCheated();
-            Log.d("cheat", Boolean.toString(mCheatedArray[i]));
         }
         savedInstanceState.putBooleanArray(KEY_CHEATED_ARRAY, mCheatedArray);
+
+        savedInstanceState.putDouble(KEY_SCORE, mScore);
     }
 
     @Override
